@@ -1,0 +1,34 @@
+{
+  "name": "drvs",
+  "version": "0.1.0",
+  "description": "Dynamic Revealing Vector Search — a corpus-agnostic, mostly-client-side search engine: exact/lexical/dictionary/relation/semantic channels fused with an honest tiered-confidence UI contract, plus a Python build-time pipeline for chunking and embedding any document corpus.",
+  "license": "MIT",
+  "author": "Neo.K / EveMissLab",
+  "type": "module",
+  "main": "core/index.js",
+  "exports": {
+    ".": "./core/index.js",
+    "./core": "./core/index.js",
+    "./client": "./client/vector-client.js"
+  },
+  "files": [
+    "core",
+    "client",
+    "schema"
+  ],
+  "scripts": {
+    "test": "node tests/test_scoring.mjs"
+  },
+  "keywords": [
+    "search",
+    "semantic-search",
+    "vector-search",
+    "embeddings",
+    "static-site",
+    "client-side-search"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kakon77777-commits/drvs.git"
+  }
+}

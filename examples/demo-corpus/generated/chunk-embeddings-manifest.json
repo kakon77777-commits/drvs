@@ -1,0 +1,225 @@
+{
+ "model": "BAAI/bge-small-zh-v1.5",
+ "onnx_model": "Xenova/bge-small-zh-v1.5",
+ "dim": 512,
+ "query_instruction": "为这个句子生成表示以用于检索相关文章：",
+ "generated_at": "2026-07-28T08:53:45Z",
+ "items": {
+  "avocado-ripeness#chunk-0": {
+   "hash": "sha256:a3a9352064124d83",
+   "index": 0,
+   "doc_id": "avocado-ripeness",
+   "heading": null
+  },
+  "avocado-ripeness#chunk-1": {
+   "hash": "sha256:335cad73965e7809",
+   "index": 1,
+   "doc_id": "avocado-ripeness",
+   "heading": "用手感判斷"
+  },
+  "avocado-ripeness#chunk-2": {
+   "hash": "sha256:00d94d6db3db45fb",
+   "index": 2,
+   "doc_id": "avocado-ripeness",
+   "heading": "果蒂觀察法"
+  },
+  "avocado-ripeness#chunk-3": {
+   "hash": "sha256:3be58ac1541a8a45",
+   "index": 3,
+   "doc_id": "avocado-ripeness",
+   "heading": "催熟與保存"
+  },
+  "balcony-tomato-basics#chunk-0": {
+   "hash": "sha256:841d4f809a8d6421",
+   "index": 4,
+   "doc_id": "balcony-tomato-basics",
+   "heading": null
+  },
+  "balcony-tomato-basics#chunk-1": {
+   "hash": "sha256:6cbf8b676163fb0a",
+   "index": 5,
+   "doc_id": "balcony-tomato-basics",
+   "heading": "選盆與介質"
+  },
+  "balcony-tomato-basics#chunk-2": {
+   "hash": "sha256:4b3108db34a58b18",
+   "index": 6,
+   "doc_id": "balcony-tomato-basics",
+   "heading": "澆水節奏"
+  },
+  "balcony-tomato-basics#chunk-3": {
+   "hash": "sha256:d2434d483a5defb5",
+   "index": 7,
+   "doc_id": "balcony-tomato-basics",
+   "heading": "支架與側芽"
+  },
+  "balcony-tomato-pests#chunk-0": {
+   "hash": "sha256:60803845a4bd5b88",
+   "index": 8,
+   "doc_id": "balcony-tomato-pests",
+   "heading": null
+  },
+  "balcony-tomato-pests#chunk-1": {
+   "hash": "sha256:9be4a1b6d077f149",
+   "index": 9,
+   "doc_id": "balcony-tomato-pests",
+   "heading": "葉背蚜蟲與粉蝨"
+  },
+  "balcony-tomato-pests#chunk-2": {
+   "hash": "sha256:e6854af7211fd5e5",
+   "index": 10,
+   "doc_id": "balcony-tomato-pests",
+   "heading": "葉斑與早疫病"
+  },
+  "balcony-tomato-pests#chunk-3": {
+   "hash": "sha256:895d9db449779bb2",
+   "index": 11,
+   "doc_id": "balcony-tomato-pests",
+   "heading": "根系悶根"
+  },
+  "bike-chain-maintenance#chunk-0": {
+   "hash": "sha256:054ce52bf297c258",
+   "index": 12,
+   "doc_id": "bike-chain-maintenance",
+   "heading": null
+  },
+  "bike-chain-maintenance#chunk-1": {
+   "hash": "sha256:c3e0e365be74e7dd",
+   "index": 13,
+   "doc_id": "bike-chain-maintenance",
+   "heading": "上油頻率與方式"
+  },
+  "bike-chain-maintenance#chunk-2": {
+   "hash": "sha256:8643dd0ca8850a73",
+   "index": 14,
+   "doc_id": "bike-chain-maintenance",
+   "heading": "判斷鏈條是否該更換"
+  },
+  "bike-chain-maintenance#chunk-3": {
+   "hash": "sha256:0b594e3ac4e94da2",
+   "index": 15,
+   "doc_id": "bike-chain-maintenance",
+   "heading": "清潔與收納"
+  },
+  "cat-nail-trimming#chunk-0": {
+   "hash": "sha256:c947af87ef3d4e76",
+   "index": 16,
+   "doc_id": "cat-nail-trimming",
+   "heading": null
+  },
+  "cat-nail-trimming#chunk-1": {
+   "hash": "sha256:41e9929c637df34c",
+   "index": 17,
+   "doc_id": "cat-nail-trimming",
+   "heading": "認識指甲構造"
+  },
+  "cat-nail-trimming#chunk-2": {
+   "hash": "sha256:301fc9aa99b4de5f",
+   "index": 18,
+   "doc_id": "cat-nail-trimming",
+   "heading": "修剪前的安撫"
+  },
+  "cat-nail-trimming#chunk-3": {
+   "hash": "sha256:01182859989670c8",
+   "index": 19,
+   "doc_id": "cat-nail-trimming",
+   "heading": "不小心剪到流血怎麼辦"
+  },
+  "coffee-bean-storage#chunk-0": {
+   "hash": "sha256:002898a7188659e2",
+   "index": 20,
+   "doc_id": "coffee-bean-storage",
+   "heading": null
+  },
+  "coffee-bean-storage#chunk-1": {
+   "hash": "sha256:1c1fb50d89d65c1f",
+   "index": 21,
+   "doc_id": "coffee-bean-storage",
+   "heading": "咖啡豆的四大敵人"
+  },
+  "coffee-bean-storage#chunk-2": {
+   "hash": "sha256:8d7cdb29ae87f38d",
+   "index": 22,
+   "doc_id": "coffee-bean-storage",
+   "heading": "適合的保存容器"
+  },
+  "coffee-bean-storage#chunk-3": {
+   "hash": "sha256:53da304b0014031b",
+   "index": 23,
+   "doc_id": "coffee-bean-storage",
+   "heading": "需不需要冷凍"
+  },
+  "dadaocheng-half-day#chunk-0": {
+   "hash": "sha256:4c3ca891965990b7",
+   "index": 24,
+   "doc_id": "dadaocheng-half-day",
+   "heading": null
+  },
+  "dadaocheng-half-day#chunk-1": {
+   "hash": "sha256:079b1711631d3d3a",
+   "index": 25,
+   "doc_id": "dadaocheng-half-day",
+   "heading": "上午：迪化街南段"
+  },
+  "dadaocheng-half-day#chunk-2": {
+   "hash": "sha256:d29af2dba9967cb0",
+   "index": 26,
+   "doc_id": "dadaocheng-half-day",
+   "heading": "中午：永樂市場周邊小吃"
+  },
+  "dadaocheng-half-day#chunk-3": {
+   "hash": "sha256:bfa51e0ae5cdd10f",
+   "index": 27,
+   "doc_id": "dadaocheng-half-day",
+   "heading": "下午：碼頭與夕陽"
+  },
+  "dehumidifier-maintenance#chunk-0": {
+   "hash": "sha256:672fa3b0d09bcd9c",
+   "index": 28,
+   "doc_id": "dehumidifier-maintenance",
+   "heading": null
+  },
+  "dehumidifier-maintenance#chunk-1": {
+   "hash": "sha256:e610ba477c4989bc",
+   "index": 29,
+   "doc_id": "dehumidifier-maintenance",
+   "heading": "濾網清潔頻率"
+  },
+  "dehumidifier-maintenance#chunk-2": {
+   "hash": "sha256:9d7cb065ee8d98bb",
+   "index": 30,
+   "doc_id": "dehumidifier-maintenance",
+   "heading": "水箱與黴菌"
+  },
+  "dehumidifier-maintenance#chunk-3": {
+   "hash": "sha256:671129aea95ccaca",
+   "index": 31,
+   "doc_id": "dehumidifier-maintenance",
+   "heading": "擺放位置"
+  },
+  "pourover-temp-grind#chunk-0": {
+   "hash": "sha256:95d692a3f02c4d5e",
+   "index": 32,
+   "doc_id": "pourover-temp-grind",
+   "heading": null
+  },
+  "pourover-temp-grind#chunk-1": {
+   "hash": "sha256:9c36f3df18e27c21",
+   "index": 33,
+   "doc_id": "pourover-temp-grind",
+   "heading": "水溫的影響"
+  },
+  "pourover-temp-grind#chunk-2": {
+   "hash": "sha256:8d0a2c5118d947ed",
+   "index": 34,
+   "doc_id": "pourover-temp-grind",
+   "heading": "研磨度的搭配邏輯"
+  },
+  "pourover-temp-grind#chunk-3": {
+   "hash": "sha256:3ea6d90b1148771e",
+   "index": 35,
+   "doc_id": "pourover-temp-grind",
+   "heading": "判斷是否需要調整"
+  }
+ }
+}

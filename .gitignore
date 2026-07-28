@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+*.egg-info/
+*.log
+
+# The demo corpus's generated+dist output IS committed on purpose (unlike a
+# real deployment's dist/, which is a large rebuilt-every-time artifact) —
+# it's what lets `node examples/demo-corpus/query_demo.mjs` work immediately
+# after a fresh clone, with no model download required just to try DRVS.

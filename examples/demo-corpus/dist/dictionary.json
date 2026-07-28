@@ -1,0 +1,15 @@
+{
+  "entries": [
+    {
+      "concept_id": "concept-avocado",
+      "canonical": "酪梨",
+      "aliases": [
+        {
+          "term": "牛油果",
+          "weight": 0.95
+        }
+      ],
+      "related": []
+    }
+  ]
+}

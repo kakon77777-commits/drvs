@@ -1,0 +1,45 @@
+{
+ "model": "BAAI/bge-small-zh-v1.5",
+ "onnx_model": "Xenova/bge-small-zh-v1.5",
+ "dim": 512,
+ "query_instruction": "为这个句子生成表示以用于检索相关文章：",
+ "generated_at": "2026-07-28T08:53:40Z",
+ "items": {
+  "avocado-ripeness": {
+   "hash": "sha256:07b77f8f791c4fa7",
+   "index": 0
+  },
+  "balcony-tomato-basics": {
+   "hash": "sha256:cdc8f4b70f3c5460",
+   "index": 1
+  },
+  "balcony-tomato-pests": {
+   "hash": "sha256:f1d5f328d0703f15",
+   "index": 2
+  },
+  "bike-chain-maintenance": {
+   "hash": "sha256:a2d1e797f832d0ef",
+   "index": 3
+  },
+  "cat-nail-trimming": {
+   "hash": "sha256:c7348683ad500f9c",
+   "index": 4
+  },
+  "coffee-bean-storage": {
+   "hash": "sha256:b913b190a42ca49b",
+   "index": 5
+  },
+  "dadaocheng-half-day": {
+   "hash": "sha256:8ee5e5d710ce1df3",
+   "index": 6
+  },
+  "dehumidifier-maintenance": {
+   "hash": "sha256:5e35d0134314b8d0",
+   "index": 7
+  },
+  "pourover-temp-grind": {
+   "hash": "sha256:deb695daf9451c60",
+   "index": 8
+  }
+ }
+}
