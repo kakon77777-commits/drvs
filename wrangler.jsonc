@@ -1,0 +1,22 @@
+// DRVS — drvs.evemisslab.com
+// Assets-only Worker (no server code): the whole point of the package is that
+// search runs in the visitor's browser against static files, so the site that
+// demonstrates it should need nothing more than static hosting either.
+//
+// A Worker custom_domain route creates its own DNS record on deploy, which a
+// Pages custom domain does not — hence a Worker rather than Pages for a new
+// subdomain.
+//
+// Build first, then deploy:
+//   python3 site/build.py
+//   npx wrangler deploy
+{
+  "name": "drvs",
+  "compatibility_date": "2026-07-28",
+  "assets": {
+    "directory": "./site/dist"
+  },
+  "routes": [
+    { "pattern": "drvs.evemisslab.com", "custom_domain": true }
+  ]
+}

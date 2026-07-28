@@ -1,0 +1,228 @@
+/* DRVS — Dynamic Revealing Vector Search
+   ui/reveal.css: the visual half of reverse semantic masking.
+
+   Self-contained by design: every color, size, and timing is a --drvs-*
+   custom property with a sensible default, so this file can be dropped onto
+   any host page without inheriting or fighting that page's design tokens.
+   To theme it, override the properties on :root (or any ancestor of the
+   search root) — you should never need to edit or fork this file.
+
+   Accessibility contract: tier state is NEVER communicated by color alone.
+   Each row gets an opacity step AND a text label ("A｜精確：標題精確命中"),
+   and each carries data-drvs-tier / data-drvs-score attributes for assistive
+   tech and for your own CSS to hook. Opacity alone would fail anyone with
+   low vision; color alone would fail anyone with a color vision deficiency. */
+
+:root {
+  --drvs-fg: #1c1b19;
+  --drvs-fg-dim: #55524d;
+  --drvs-fg-faint: #85807a;
+  --drvs-bg: transparent;
+  --drvs-surface: rgba(0, 0, 0, 0.02);
+  --drvs-line: rgba(0, 0, 0, 0.16);
+  --drvs-accent: #9a7b2f;
+  --drvs-accent-contrast: #fffdf7;
+  --drvs-notice: #2f6b63;
+  --drvs-radius: 10px;
+  --drvs-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --drvs-tier-a-opacity: 1;
+  --drvs-tier-b-opacity: 0.92;
+  --drvs-tier-c-opacity: 0.62;
+  --drvs-tier-d-opacity: 0.38;
+  --drvs-hidden-opacity: 0.12;
+  --drvs-transition: 180ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --drvs-fg: #e9e3d6;
+    --drvs-fg-dim: #b3ab9c;
+    --drvs-fg-faint: #857f74;
+    --drvs-surface: rgba(233, 227, 214, 0.03);
+    --drvs-line: rgba(233, 227, 214, 0.18);
+    --drvs-accent: #c9a227;
+    --drvs-accent-contrast: #14130f;
+    --drvs-notice: #6fb3a8;
+  }
+}
+
+/* ------------------------------------------------------------ control panel */
+
+.drvs-panel {
+  border: 1px solid var(--drvs-line);
+  border-radius: var(--drvs-radius);
+  padding: 1.1rem 1.3rem;
+  background: var(--drvs-surface);
+  color: var(--drvs-fg);
+}
+
+.drvs-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.drvs-input-wrap {
+  position: relative;
+  flex: 1 1 18rem;
+  min-width: 12rem;
+}
+
+.drvs-input {
+  width: 100%;
+  font: inherit;
+  font-size: 1.02rem;
+  color: var(--drvs-fg);
+  background: var(--drvs-bg);
+  border: 1px solid var(--drvs-line);
+  border-radius: calc(var(--drvs-radius) - 3px);
+  padding: 0.65rem 2.4rem 0.65rem 0.9rem;
+}
+
+.drvs-input::placeholder { color: var(--drvs-fg-faint); }
+
+.drvs-input:focus {
+  outline: none;
+  border-color: var(--drvs-accent);
+}
+
+/* Focus-visible outline is kept separate from the border recolor above so
+   keyboard users still get a real focus ring even if a host overrides the
+   accent color to something low-contrast. */
+.drvs-input:focus-visible,
+.drvs-mode-btn:focus-visible,
+.drvs-reset-btn:focus-visible,
+.drvs-clear:focus-visible {
+  outline: 2px solid var(--drvs-accent);
+  outline-offset: 2px;
+}
+
+.drvs-clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--drvs-fg-faint);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  display: none;
+}
+.drvs-input-wrap.has-query .drvs-clear { display: block; }
+.drvs-clear:hover { color: var(--drvs-fg); }
+
+.drvs-mode-btn,
+.drvs-reset-btn {
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--drvs-fg-dim);
+  background: transparent;
+  border: 1px solid var(--drvs-line);
+  border-radius: calc(var(--drvs-radius) - 3px);
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color var(--drvs-transition), color var(--drvs-transition);
+}
+
+.drvs-mode-btn[aria-pressed="true"] {
+  color: var(--drvs-accent-contrast);
+  background: var(--drvs-accent);
+  border-color: var(--drvs-accent);
+}
+
+.drvs-mode-btn:hover,
+.drvs-reset-btn:hover { border-color: var(--drvs-accent); }
+
+.drvs-meta {
+  margin-top: 0.65rem;
+  font-family: var(--drvs-mono);
+  font-size: 0.74rem;
+  color: var(--drvs-fg-faint);
+  letter-spacing: 0.02em;
+  min-height: 1.1em;
+}
+
+.drvs-expansions {
+  margin-top: 0.4rem;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--drvs-accent);
+  display: none;
+}
+.drvs-expansions.show { display: block; }
+
+.drvs-banner {
+  margin-top: 0.65rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--drvs-notice);
+  display: none;
+}
+.drvs-banner.show { display: block; }
+.drvs-banner.low { color: var(--drvs-accent); }
+
+/* --------------------------------------------------------- per-row reveal */
+
+[data-drvs-tier="A"] { opacity: var(--drvs-tier-a-opacity); }
+[data-drvs-tier="B"] { opacity: var(--drvs-tier-b-opacity); }
+[data-drvs-tier="C"] { opacity: var(--drvs-tier-c-opacity); }
+[data-drvs-tier="D"] { opacity: var(--drvs-tier-d-opacity); }
+
+.drvs-hidden {
+  opacity: var(--drvs-hidden-opacity);
+  pointer-events: none;
+}
+
+/* Focus mode: masked rows leave the flow entirely. Reveal mode (the default)
+   keeps them present but dimmed, which is the whole point of the technique —
+   a reader can still see WHERE the matches sit within the original structure
+   instead of getting a detached result list with no context. */
+.drvs-focus .drvs-hidden { display: none; }
+.drvs-focus .drvs-empty-group { display: none; }
+
+.drvs-reason {
+  font-family: var(--drvs-mono);
+  font-size: 0.68rem;
+  color: var(--drvs-accent);
+  letter-spacing: 0.02em;
+  margin-left: 0.55rem;
+  white-space: nowrap;
+}
+
+/* A padding row has no reason of its own. It says so, and it says so in the
+   muted voice — it must not look like a finding. */
+.drvs-reason-padding {
+  color: var(--drvs-fg-faint);
+  font-style: italic;
+}
+
+/* Opacity is animated, but only for people who haven't asked for less motion.
+   The reveal transition is the one piece of motion this package adds. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-drvs-visible],
+  .drvs-hidden {
+    transition: opacity var(--drvs-transition);
+  }
+}
+
+/* Forced-colors (Windows High Contrast) flattens opacity differences, so the
+   tier signal has to come from something else there — the text label already
+   present in every row carries it, and the masked rows get an explicit
+   reduced-prominence treatment rather than silently looking identical. */
+@media (forced-colors: active) {
+  [data-drvs-tier] { opacity: 1; }
+  .drvs-hidden { opacity: 1; }
+  .drvs-mode-btn[aria-pressed="true"] { border-width: 3px; }
+}
+
+@media (max-width: 640px) {
+  .drvs-row { flex-direction: column; align-items: stretch; }
+  .drvs-mode-btn, .drvs-reset-btn { flex: 1; }
+  .drvs-reason { white-space: normal; margin-left: 0; display: block; margin-top: 0.2rem; }
+}

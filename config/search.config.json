@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "note": "DRVS runtime config. Hand-authored, not build-generated — copy this next to your index and tune it. `drvs_enabled: false` is a single-flag kill switch: set it and the search UI hides itself, returning the host page to its original unfiltered state with no code change and no rebuild.",
+
+  "drvs_enabled": true,
+
+  "search": {
+    "minimum_results": 5,
+    "max_results": 200,
+    "initial_threshold": 0.78,
+    "threshold_step": 0.08,
+    "absolute_floor": 0.28
+  },
+
+  "channels": {
+    "exact": true,
+    "lexical": true,
+    "dictionary": true,
+    "semantic": true,
+    "relations": true
+  },
+
+  "tiers": {
+    "tier_A": 0.82,
+    "tier_B": 0.68,
+    "tier_C": 0.54,
+    "tier_D": 0.38
+  },
+
+  "weights": {
+    "exact_title": 1.0,
+    "exact_summary": 0.82,
+    "alias_title": 0.88,
+    "lexical": 0.6,
+    "semantic": 0.55,
+    "series_relation": 0.25,
+    "direct_link_relation": 0.3,
+    "anchor_bonus": 0.08,
+    "related_term": 0.45
+  },
+
+  "expansion_limits": {
+    "max_aliases": 8,
+    "max_related_terms": 6,
+    "max_graph_depth": 1,
+    "min_expansion_confidence": 0.6
+  },
+
+  "diversity": {
+    "max_per_series_top_10": 4,
+    "max_same_title_prefix_top_10": 3
+  },
+
+  "display": {
+    "default_mode": "reveal",
+    "tier_a_opacity": 1.0,
+    "tier_b_opacity": 0.92,
+    "tier_c_opacity": 0.62,
+    "tier_d_opacity": 0.38,
+    "hidden_opacity": 0.12
+  },
+
+  "debounce_ms": 300,
+  "max_query_length": 80
+}

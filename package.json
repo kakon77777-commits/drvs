@@ -9,15 +9,23 @@
   "exports": {
     ".": "./core/index.js",
     "./core": "./core/index.js",
-    "./client": "./client/vector-client.js"
+    "./client": "./client/vector-client.js",
+    "./ui": "./ui/reveal.js",
+    "./ui/reveal.css": "./ui/reveal.css",
+    "./ui/search-worker.js": "./ui/search-worker.js",
+    "./config/search.config.json": "./config/search.config.json"
   },
   "files": [
     "core",
     "client",
+    "ui",
+    "config",
     "schema"
   ],
   "scripts": {
-    "test": "node tests/test_scoring.mjs"
+    "test": "node tests/test_scoring.mjs && python3 tests/test_chunk.py && python3 tests/test_relations.py && python3 tests/test_dictionary.py && python3 tests/test_extract.py",
+    "test:js": "node tests/test_scoring.mjs",
+    "test:py": "python3 tests/test_chunk.py && python3 tests/test_relations.py && python3 tests/test_dictionary.py && python3 tests/test_extract.py"
   },
   "keywords": [
     "search",

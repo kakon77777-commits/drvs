@@ -146,7 +146,43 @@ or if a particular channel matters more or less for your use case, override
 the relevant sub-object — see `core/scoring.js`'s `DEFAULT_*` exports for
 what's tunable and why each default is what it is.
 
-## 8. Test your integration
+## 8. Mount the reveal UI
+
+`ui/reveal.js` attaches to a list you already render — it never generates your
+rows. Give it a root for its own controls and a selector matching your rows:
+
+```js
+import { createRevealUI, STRINGS_EN } from "drvs/ui";
+
+createRevealUI({
+  root: "#search",                 // controls are built in here
+  rowSelector: "[data-doc-id]",    // your rows; each needs data-doc-id
+  reasonTarget: ".title",          // optional: where the reason label is appended
+  groupSelector: "section",        // optional: hides a group when all its rows are masked
+  indexUrl: "/drvs/index.json",
+  dictionaryUrl: "/drvs/dictionary.json",
+  vectorsUrl: "/drvs/vectors.bin", // omit to leave the semantic channel off
+  vectorsMetaUrl: "/drvs/vectors-meta.json",
+  strings: STRINGS_EN,             // zh-Hant is the built-in default
+});
+```
+
+Three things to get right:
+
+- **`data-doc-id` must match your index's `i` field exactly.** A mismatch is
+  silent: every row simply masks on every query, because nothing ever matches.
+- **Serve `ui/`, `core/`, and `client/` with their relative layout intact.**
+  The Worker resolves `../core/scoring.js` against its own served URL. Flatten
+  the directories and it 404s.
+- **Style via `--drvs-*` custom properties**, not by forking `ui/reveal.css`.
+  See its top block for the full list.
+
+Reason labels come from `cfg.labels` and can be supplied in your JSON config —
+interpolating ones use a `{}` placeholder there, since JSON has no functions.
+UI chrome (buttons, banners) comes from the separate `strings` option, because
+it belongs to the page, not the index.
+
+## 9. Test your integration
 
 Don't just eyeball a few queries in a browser. Build a small test set
 covering: exact title matches, known aliases, natural-language paraphrases

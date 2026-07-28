@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DRVS — search that dims instead of replacing</title>
+<meta name="description" content="A corpus-agnostic, mostly client-side search engine. Instead of replacing your page with a result list, it dims what doesn't match and tells you why what's left is there. MIT.">
+<meta name="color-scheme" content="dark">
+
+<meta property="og:title" content="DRVS — search that dims instead of replacing">
+<meta property="og:description" content="Reverse semantic masking: your list stays put, the misses fade, and every hit says what actually matched.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://drvs.evemisslab.com/">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/drvs/ui/reveal.css">
+<link rel="stylesheet" href="/assets/styles.css">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<a class="skip" href="#demo">Skip to the live demo</a>
+
+<header class="masthead">
+  <div class="wrap masthead-in">
+    <span class="wordmark">DRVS</span>
+    <nav aria-label="Primary">
+      <a href="#demo">Demo</a>
+      <a href="#tiers">Tiers</a>
+      <a href="#channels">Channels</a>
+      <a href="#install">Install</a>
+      <a class="ext" href="https://github.com/kakon77777-commits/drvs">GitHub<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ── HERO: the mechanism is the pitch, so the demo *is* the hero ───────── -->
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Dynamic Revealing Vector Search</p>
+    <h1>Most search<br>replaces the page.<br><em>This one develops it.</em></h1>
+    <p class="lede">
+      Your list stays exactly where it is, in its own order. A query only changes
+      how <em>visible</em> each row is — strong matches stay lit, weak ones dim,
+      misses fade to a ghost. Nothing is moved, re-sorted, or removed.
+      You keep the context that a results page throws away.
+    </p>
+
+    <ul class="facts">
+      <li><span>MIT</span> licensed</li>
+      <li><span>0</span> runtime dependencies</li>
+      <li><span>0</span> servers required</li>
+      <li><span>145</span> tests, no framework</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── LIVE DEMO ─────────────────────────────────────────────────────────── -->
+<section id="demo" class="demo" data-drvs-root>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Try it on a real index</h2>
+      <p>
+        Nine documents about entirely mundane things — coffee, balcony tomatoes,
+        a bike chain — deliberately unrelated to anything DRVS was extracted from.
+        This is the actual package running in your browser against a real
+        prebuilt index. Not a mockup, not a recording.
+      </p>
+    </div>
+
+    <div class="try">
+      <span class="try-label">Try</span>
+      <button class="chip" data-q="咖啡">咖啡 <i>exact</i></button>
+      <button class="chip" data-q="牛油果">牛油果 <i>alias → 酪梨</i></button>
+      <button class="chip" data-q="陽台番茄種植入門">陽台番茄種植入門 <i>relation</i></button>
+      <button class="chip" data-q="quantum chromodynamics">quantum chromodynamics <i>honest miss</i></button>
+    </div>
+
+    <!-- createRevealUI() builds its own control markup in here -->
+    <div class="panel-slot"></div>
+
+    <noscript>
+      <p class="noscript-note">
+        JavaScript is off, so the search layer isn't running — and the nine
+        documents below are all still here, fully readable. That is the design,
+        not a fallback: the reveal layer is additive, and nothing it does is
+        required to read the page.
+      </p>
+    </noscript>
+
+    <!-- Rendered at build time from the demo corpus index. View source: every
+         document is in the HTML, not injected by the script. -->
+    <ol class="corpus">
+<!--DOCUMENT_ROWS-->
+    </ol>
+
+    <p class="corpus-foot">
+      Documents are in Traditional Chinese; the interface is in English. Both the
+      reason labels and the UI strings are configuration, so they don't have to
+      agree with the corpus — or with each other.
+    </p>
+  </div>
+</section>
+
+<!-- ── SIGNATURE: the step wedge ─────────────────────────────────────────── -->
+<section id="tiers" class="wedge-section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Confidence, calibrated</p>
+      <h2>Four tiers, and a floor you can see</h2>
+      <p>
+        A photographer checks an exposure against a step wedge — a strip of known,
+        evenly-spaced densities. DRVS ranks the same way: every result lands on a
+        fixed step, and the step is the opacity you actually see. These are the
+        real numbers from <code>config/search.config.json</code>, not an illustration.
+      </p>
+    </div>
+
+    <div class="wedge" role="list">
+      <div class="step" role="listitem" style="--o:1">
+        <div class="patch"></div>
+        <b>A</b><span class="val">1.00</span>
+        <p>Exact. The query is literally in the title, a heading, or a confirmed alias.</p>
+      </div>
+      <div class="step" role="listitem" style="--o:.92">
+        <div class="patch"></div>
+        <b>B</b><span class="val">0.92</span>
+        <p>Close. Strong lexical overlap, or an exact hit somewhere less central.</p>
+      </div>
+      <div class="step" role="listitem" style="--o:.62">
+        <div class="patch"></div>
+        <b>C</b><span class="val">0.62</span>
+        <p>Weak. Character-level or embedding similarity, with no literal anchor.</p>
+      </div>
+      <div class="step" role="listitem" style="--o:.38">
+        <div class="patch"></div>
+        <b>D</b><span class="val">0.38</span>
+        <p>Distant. Usually structural — a sibling of something that did match.</p>
+      </div>
+      <div class="step masked" role="listitem" style="--o:.12">
+        <div class="patch"></div>
+        <b>—</b><span class="val">0.12</span>
+        <p>Masked. Still on the page, still readable, just out of the way.</p>
+      </div>
+    </div>
+
+    <p class="wedge-note">
+      Tier is never carried by color alone. Each row gets an opacity step
+      <em>and</em> a text label naming the reason, plus
+      <code>data-drvs-tier</code> for assistive tech. In forced-colors mode the
+      opacity ladder flattens and the labels carry it on their own.
+    </p>
+  </div>
+</section>
+
+<!-- ── CHANNELS ──────────────────────────────────────────────────────────── -->
+<section id="channels" class="channels">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Five channels, one honest answer</p>
+      <h2>A hit reason must name what actually matched</h2>
+      <p>
+        Not a relevance score. Not "the model thinks so." Every result carries a
+        specific claim you can check — and if a channel has nothing to say about
+        a document, it stays silent rather than inventing a number.
+      </p>
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <h3>Exact</h3>
+        <p>Substring against title, headings, summary, keywords. Always outranks everything below it.</p>
+        <code>exact title match</code>
+      </article>
+      <article class="card">
+        <h3>Lexical</h3>
+        <p>CJK bigrams and Latin token overlap, so typos and paraphrases still land. No stemmer, no language config.</p>
+        <code>lexical similarity</code>
+      </article>
+      <article class="card">
+        <h3>Dictionary</h3>
+        <p>Alias expansion from evidence you can point at — a curated set, or an acronym a document defines in its own title.</p>
+        <code>matched known alias “牛油果”</code>
+      </article>
+      <article class="card">
+        <h3>Relation</h3>
+        <p>A document with no direct hit can ride in on a curated link to one that did — and it says so, rather than pretending it matched.</p>
+        <code>same series as a confirmed match</code>
+      </article>
+      <article class="card accent">
+        <h3>Semantic</h3>
+        <p>Embeddings compared in the browser against prebuilt vectors. No API, no per-query cost. Chunk-level, so it can name the passage.</p>
+        <code>this passage is close (Storage)</code>
+      </article>
+      <article class="card quiet">
+        <h3>…and when it fails</h3>
+        <p>Every optional channel degrades structurally. No dictionary, no vectors, model won't load — the rest keeps working and nothing upstream notices.</p>
+        <code>exact + lexical still ranked</code>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ── HONESTY ───────────────────────────────────────────────────────────── -->
+<section class="principles">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">The part most search UIs get wrong</p>
+      <h2>Never return zero results without saying so</h2>
+    </div>
+    <div class="pair">
+      <div class="do">
+        <h3>What DRVS does</h3>
+        <p>
+          When nothing clears the confidence bar, it relaxes the threshold, still
+          returns the closest documents, and tells you plainly that it did:
+          <em>"No high-confidence direct match. Showing the semantically closest
+          documents only."</em> You can see the results and you can see the caveat.
+        </p>
+      </div>
+      <div class="dont">
+        <h3>What it refuses to do</h3>
+        <p>
+          Dress a weak match up as a confident one. Relaxing the threshold is
+          always disclosed, a low-confidence banner is never suppressed, and an
+          index with genuinely nothing in it says so rather than padding the list.
+          Non-zero results is not permission to fabricate.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INSTALL ───────────────────────────────────────────────────────────── -->
+<section id="install" class="install">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Getting started</p>
+      <h2>Point it at a list you already have</h2>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <h3><span class="num">1</span> Build an index</h3>
+        <p>Python, build time. The helpers do the file-level work — frontmatter, headings, summary, keywords — so your adapter is mostly plumbing.</p>
+        <pre><code><span class="c"># your adapter walks your corpus and assigns ids</span>
+<span class="k">from</span> build.extract <span class="k">import</span> extract_document, compact_document
+
+docs = [extract_document(doc_id, title, url, text)
+        <span class="k">for</span> doc_id, title, url, text <span class="k">in</span> my_corpus()]
+
+index = {<span class="s">"count"</span>: len(docs),
+         <span class="s">"documents"</span>: [compact_document(d) <span class="k">for</span> d <span class="k">in</span> docs]}</code></pre>
+      </div>
+
+      <div class="col">
+        <h3><span class="num">2</span> Mount the reveal layer</h3>
+        <p>The control markup is built for you. Your rows are left alone except for classes and data attributes.</p>
+        <pre><code><span class="k">import</span> { createRevealUI, STRINGS_EN } <span class="k">from</span> <span class="s">"drvs/ui"</span>;
+
+createRevealUI({
+  root: <span class="s">"#search"</span>,
+  rowSelector: <span class="s">"[data-doc-id]"</span>,
+  indexUrl: <span class="s">"/drvs/index.json"</span>,
+  strings: STRINGS_EN,
+});</code></pre>
+      </div>
+
+      <div class="col">
+        <h3><span class="num">3</span> Theme it</h3>
+        <p>Override custom properties. You should never need to fork the stylesheet.</p>
+        <pre><code><span class="p">:root</span> {
+  <span class="v">--drvs-accent</span>: <span class="s">#e8743b</span>;
+  <span class="v">--drvs-tier-c-opacity</span>: <span class="s">.62</span>;
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="honest">
+      <h3>What you still have to build yourself</h3>
+      <p>
+        The adapter that turns your actual files into documents — walking your
+        storage, assigning stable ids, mapping URLs. DRVS deliberately has no
+        opinion on what a corpus is made of, because that is the one part no
+        generic package can do for you honestly.
+      </p>
+      <p>
+        And what goes in the dictionary. The builder will propose entries from
+        self-defining titles, but a fabricated alias is the most damaging thing
+        this system can do: it makes unrelated documents look like confirmed
+        matches, under the most authoritative label the interface has. Read
+        <code>audit_candidates()</code> output before shipping one.
+      </p>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn primary" href="https://github.com/kakon77777-commits/drvs">Read the source</a>
+      <a class="btn" href="https://github.com/kakon77777-commits/drvs/blob/main/docs/ADAPTING_A_CORPUS.md">Adapting a corpus</a>
+      <a class="btn" href="https://github.com/kakon77777-commits/drvs/blob/main/schema/document.md">Document schema</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>
+      <p class="foot-mark">DRVS</p>
+      <p class="foot-note">
+        Distilled from a production deployment over a ~2,000-document corpus,
+        then re-verified against a corpus with nothing in common with it.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://github.com/kakon77777-commits/drvs">GitHub</a>
+      <a href="https://evemisslab.com">EveMissLab</a>
+      <a href="https://logic.evemisslab.com">Logic Matrix</a>
+      <span>MIT</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="/assets/app.js"></script>
+</body>
+</html>

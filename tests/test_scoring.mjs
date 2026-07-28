@@ -12,7 +12,7 @@ import { dirname, join } from "node:path";
 import {
   normalizeQuery, tokenize, trigrams, expandQuery, prepareIndex,
   scoreDocument, assignTier, diversityRerank, titlePrefixKey, scoreCorpus,
-  DEFAULT_CONFIG, DEFAULT_TIERS,
+  DEFAULT_CONFIG, DEFAULT_TIERS, DEFAULT_LABELS, LABELS_EN,
 } from "../core/scoring.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -154,6 +154,47 @@ check("scoreCorpus", "empty document list returns empty_index without throwing",
   const weak = result.results.find((r) => r.id === "d2");
   check("relations", "an unrecognized relation type code never throws and still produces a result", !!weak);
   check("relations", "an unrecognized relation type code falls back to a generic (not misleadingly specific) label", weak?.reasons[0]?.relation === "related");
+}
+
+// --- reason labels are configuration, not constants ----------------------
+// The hit-reason label is this package's headline honesty feature; if it were
+// locked to one language the feature would only work for one audience.
+{
+  const docs = prepareIndex([{ i: "d1", t: "Balcony tomato basics", s: "", h: [], k: [], r: [], p: null }]);
+  const q = "Balcony tomato basics";
+
+  const zh = scoreCorpus(docs, q, DEFAULT_CONFIG, []);
+  check("labels", "default labels are the zh-Hant set the package shipped with",
+    zh.results[0]?.reasons[0]?.label === DEFAULT_LABELS.exact_title, `got=${zh.results[0]?.reasons[0]?.label}`);
+
+  const en = scoreCorpus(docs, q, { ...DEFAULT_CONFIG, labels: LABELS_EN }, []);
+  check("labels", "supplying LABELS_EN switches the reason text to English",
+    en.results[0]?.reasons[0]?.label === "exact title match", `got=${en.results[0]?.reasons[0]?.label}`);
+
+  // A partial override must not blank out the labels it doesn't mention.
+  const partial = scoreCorpus(docs, q, { ...DEFAULT_CONFIG, labels: { lexical: "custom lexical" } }, []);
+  check("labels", "a partial label override falls back to defaults for unspecified keys",
+    partial.results[0]?.reasons[0]?.label === DEFAULT_LABELS.exact_title,
+    `got=${partial.results[0]?.reasons[0]?.label}`);
+
+  // Interpolating labels are functions so a translation can place the term
+  // where its own grammar needs it, rather than in the original's word order.
+  check("labels", "an interpolating label receives the matched term",
+    LABELS_EN.alias("XIP").includes("XIP") && DEFAULT_LABELS.alias("XIP").includes("XIP"));
+  check("labels", "the chunk label has a distinct form for a known heading vs none",
+    LABELS_EN.semantic_chunk("Storage") !== LABELS_EN.semantic_chunk_generic);
+
+  // A config file arrives as JSON, which cannot hold functions — so an
+  // interpolating label has to be expressible as a "{}" template too, or
+  // config-driven deployments silently can't translate half the labels.
+  const chunkHit = new Map([[0, { score: 0.99, source: "chunk", heading: "Watering" }]]);
+  const jsonish = scoreCorpus(docs, "zzz-no-lexical-match", {
+    ...DEFAULT_CONFIG,
+    labels: { semantic_chunk: "passage matched under {}" },
+  }, [], chunkHit);
+  check("labels", "a JSON-style {} template label interpolates without needing a function",
+    jsonish.results[0]?.reasons[0]?.label === "passage matched under Watering",
+    `got=${jsonish.results[0]?.reasons[0]?.label}`);
 }
 
 console.log(`\n--- ${pass}/${pass + fail} passed ---`);

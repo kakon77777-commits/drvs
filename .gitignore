@@ -9,3 +9,8 @@ node_modules/
 # real deployment's dist/, which is a large rebuilt-every-time artifact) —
 # it's what lets `node examples/demo-corpus/query_demo.mjs` work immediately
 # after a fresh clone, with no model download required just to try DRVS.
+
+# The site build, however, is pure derived output: site/build.py assembles it
+# from site/src/ plus copies of the package and the demo corpus, so committing
+# it would just be a second copy of files already in the repo.
+site/dist/

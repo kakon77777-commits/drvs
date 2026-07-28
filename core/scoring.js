@@ -77,6 +77,60 @@ export const DEFAULT_RELATION_TYPES = {
 };
 const FALLBACK_RELATION_META = { label: "與直接結果相關", relation: "related", weightKey: "series_relation" };
 
+// Reason labels for every non-relation channel. These are the strings a
+// reader actually sees explaining why a document matched, so they are
+// configuration, not constants — a corpus in another language (or another
+// register: "cited by a match" reads differently in a legal archive than in a
+// research corpus) overrides `cfg.labels` without touching this file.
+// Relation labels live in `cfg.relationTypes` above, since their text and
+// their scoring weight have to stay together.
+//
+// Defaults are zh-Hant, matching the corpus this package was distilled from;
+// LABELS_EN below is a ready-made English set. Entries taking an argument are
+// functions so a translation can put the interpolated term where its own
+// grammar needs it, rather than being forced into the original's word order.
+export const DEFAULT_LABELS = {
+  exact_title: "標題精確命中",
+  exact_heading: "章節標題命中",
+  exact_summary: "摘要精確命中",
+  exact_keyword: "關鍵詞精確命中",
+  lexical: "詞彙相似命中",
+  trigram: "字元近似命中",
+  alias: (term) => `命中已確認別名「${term}」`,
+  related_term: (term) => `與相關詞「${term}」近似`,
+  semantic_doc: "摘要語義近似",
+  semantic_chunk: (heading) => `段落語義近似（${heading}）`,
+  // Separate key rather than a null-check inside semantic_chunk, so that a
+  // JSON config (which cannot hold functions) can still express both forms.
+  semantic_chunk_generic: "段落語義近似",
+};
+
+export const LABELS_EN = {
+  exact_title: "exact title match",
+  exact_heading: "section heading match",
+  exact_summary: "exact summary match",
+  exact_keyword: "exact keyword match",
+  lexical: "lexical similarity",
+  trigram: "character-level similarity",
+  alias: (term) => `matched known alias “${term}”`,
+  related_term: (term) => `close to related term “${term}”`,
+  semantic_doc: "summary is semantically close",
+  semantic_chunk: (heading) => `this passage is close (${heading})`,
+  semantic_chunk_generic: "a passage is semantically close",
+};
+
+// Resolve a label that may be:
+//   - a function of one argument (code-supplied label sets), or
+//   - a plain string, or
+//   - a string template containing "{}" (the only form a JSON config file can
+//     express, since JSON has no functions — and config here arrives as JSON).
+function labelFor(labels, key, arg) {
+  const v = (labels && labels[key]) ?? DEFAULT_LABELS[key];
+  if (typeof v === "function") return v(arg);
+  if (typeof v === "string" && v.includes("{}")) return v.replace("{}", arg == null ? "" : String(arg));
+  return v;
+}
+
 export const DEFAULT_CONFIG = {
   search: { minimum_results: 5, max_results: 200, initial_threshold: 0.78, threshold_step: 0.08, absolute_floor: 0.28 },
   channels: { exact: true, lexical: true, dictionary: true, semantic: true, relations: true },
@@ -85,6 +139,7 @@ export const DEFAULT_CONFIG = {
   expansion_limits: DEFAULT_EXPANSION_LIMITS,
   diversity: DEFAULT_DIVERSITY,
   relationTypes: DEFAULT_RELATION_TYPES,
+  labels: DEFAULT_LABELS,
   display: { default_mode: "reveal", tier_a_opacity: 1.0, tier_b_opacity: 0.92, tier_c_opacity: 0.62, tier_d_opacity: 0.38, hidden_opacity: 0.12 },
   debounce_ms: 300,
   max_query_length: 80,
@@ -225,8 +280,9 @@ export function prepareIndex(documents) {
 // Score ONE document against an already-normalized query. Relation/Tier-D
 // scoring needs corpus-wide context (which siblings also matched) and is
 // applied afterwards in scoreCorpus(), not here.
-export function scoreDocument(doc, queryNorm, queryTokens, queryTrigrams, weights) {
+export function scoreDocument(doc, queryNorm, queryTokens, queryTrigrams, weights, labels) {
   const w = weights || DEFAULT_WEIGHTS;
+  const L = labels || DEFAULT_LABELS;
   const reasons = [];
   const channels = new Set();
   let best = 0;
@@ -234,26 +290,26 @@ export function scoreDocument(doc, queryNorm, queryTokens, queryTrigrams, weight
   if (queryNorm) {
     if (doc._titleNorm.includes(queryNorm)) {
       channels.add("exact");
-      reasons.push({ tier: "A", label: "標題精確命中", field: "title", matched_text: queryNorm });
+      reasons.push({ tier: "A", label: labelFor(L, "exact_title"), field: "title", matched_text: queryNorm });
       best = Math.max(best, w.exact_title);
     }
     for (let i = 0; i < doc._headingsNorm.length; i++) {
       if (doc._headingsNorm[i].includes(queryNorm)) {
         channels.add("exact");
-        reasons.push({ tier: "A", label: "章節標題命中", field: "heading", matched_text: doc.h[i] });
+        reasons.push({ tier: "A", label: labelFor(L, "exact_heading"), field: "heading", matched_text: doc.h[i] });
         best = Math.max(best, w.exact_title * 0.95);
         break;
       }
     }
     if (doc._summaryNorm.includes(queryNorm)) {
       channels.add("exact");
-      reasons.push({ tier: "B", label: "摘要精確命中", field: "summary", matched_text: queryNorm });
+      reasons.push({ tier: "B", label: labelFor(L, "exact_summary"), field: "summary", matched_text: queryNorm });
       best = Math.max(best, w.exact_summary);
     }
     for (let i = 0; i < doc._keywordsNorm.length; i++) {
       if (doc._keywordsNorm[i] === queryNorm) {
         channels.add("exact");
-        reasons.push({ tier: "A", label: "關鍵詞精確命中", field: "keyword", matched_text: doc.k[i] });
+        reasons.push({ tier: "A", label: labelFor(L, "exact_keyword"), field: "keyword", matched_text: doc.k[i] });
         best = Math.max(best, w.alias_title);
         break;
       }
@@ -265,7 +321,7 @@ export function scoreDocument(doc, queryNorm, queryTokens, queryTrigrams, weight
     if (ov > 0) {
       channels.add("lexical");
       const s = w.lexical * ov;
-      reasons.push({ tier: ov >= 0.6 ? "B" : "C", label: "詞彙相似命中", field: "title/summary/headings", overlap: Number(ov.toFixed(2)) });
+      reasons.push({ tier: ov >= 0.6 ? "B" : "C", label: labelFor(L, "lexical"), field: "title/summary/headings", overlap: Number(ov.toFixed(2)) });
       best = Math.max(best, s);
     }
   }
@@ -275,7 +331,7 @@ export function scoreDocument(doc, queryNorm, queryTokens, queryTrigrams, weight
     if (tgOv > 0) {
       channels.add("lexical");
       const s = w.lexical * 0.7 * tgOv;
-      if (s > 0) reasons.push({ tier: "C", label: "字元近似命中", field: "title/summary", overlap: Number(tgOv.toFixed(2)) });
+      if (s > 0) reasons.push({ tier: "C", label: labelFor(L, "trigram"), field: "title/summary", overlap: Number(tgOv.toFixed(2)) });
       best = Math.max(best, s);
     }
   }
@@ -403,6 +459,7 @@ export function scoreCorpus(documents, rawQuery, config, dictionary, semanticSco
   const cfg = config || DEFAULT_CONFIG;
   const weights = cfg.weights || DEFAULT_WEIGHTS;
   const relationTypes = cfg.relationTypes || DEFAULT_RELATION_TYPES;
+  const labels = cfg.labels || DEFAULT_LABELS;
   const queryNorm = normalizeQuery(rawQuery);
   const original = rawQuery == null ? "" : String(rawQuery);
 
@@ -420,7 +477,7 @@ export function scoreCorpus(documents, rawQuery, config, dictionary, semanticSco
     : { aliases: [], related: [] };
 
   let scored = documents.map((d) => {
-    const r = scoreDocument(d, queryNorm, queryTokens, queryTrigrams, weights);
+    const r = scoreDocument(d, queryNorm, queryTokens, queryTrigrams, weights, labels);
     return { id: d.i, doc: d, score: r.score, channels: r.channels, reasons: r.reasons };
   });
 
@@ -443,7 +500,7 @@ export function scoreCorpus(documents, rawQuery, config, dictionary, semanticSco
         if (s > r.score) {
           r.score = s;
           r.channels = Array.from(new Set([...r.channels, "alias"]));
-          r.reasons = [{ tier: "A", label: `命中已確認別名「${a.term}」`, field, matched_text: a.term, expansion_term: a.term, relation: "alias", concept_id: a.concept_id }, ...r.reasons];
+          r.reasons = [{ tier: "A", label: labelFor(labels, "alias", a.term), field, matched_text: a.term, expansion_term: a.term, relation: "alias", concept_id: a.concept_id }, ...r.reasons];
         }
         break; // one alias hit is enough signal for this doc; don't keep stacking
       }
@@ -456,7 +513,7 @@ export function scoreCorpus(documents, rawQuery, config, dictionary, semanticSco
         if (s > r.score) {
           r.score = s;
           r.channels = Array.from(new Set([...r.channels, "related_term"]));
-          r.reasons = [{ tier: "D", label: `與相關詞「${rel.term}」近似`, field, matched_text: rel.term, expansion_term: rel.term, relation: "related", concept_id: rel.concept_id }, ...r.reasons];
+          r.reasons = [{ tier: "D", label: labelFor(labels, "related_term", rel.term), field, matched_text: rel.term, expansion_term: rel.term, relation: "related", concept_id: rel.concept_id }, ...r.reasons];
         }
         break;
       }
@@ -486,8 +543,8 @@ export function scoreCorpus(documents, rawQuery, config, dictionary, semanticSco
         r.channels = Array.from(new Set([...r.channels, "semantic"]));
         const isChunk = hit.source === "chunk";
         const label = isChunk
-          ? (hit.heading ? `段落語義近似（${hit.heading}）` : "段落語義近似")
-          : "摘要語義近似";
+          ? (hit.heading ? labelFor(labels, "semantic_chunk", hit.heading) : labelFor(labels, "semantic_chunk_generic"))
+          : labelFor(labels, "semantic_doc");
         r.reasons = [{
           tier: "C", label, field: isChunk ? "chunk" : "summary",
           semantic_score: Number(hit.score.toFixed(2)), semantic_source: hit.source,
