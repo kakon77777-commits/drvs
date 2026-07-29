@@ -17,6 +17,7 @@ it rather than an assertion about it.
 Usage:  python3 site/build.py
 """
 import json
+import re
 import shutil
 import sys
 from html import escape
@@ -26,6 +27,9 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "site" / "src"
 DIST = ROOT / "site" / "dist"
 DEMO = ROOT / "examples" / "demo-corpus"
+
+sys.path.insert(0, str(ROOT))
+from build.extract import parse_frontmatter  # noqa: E402  (the package's own parser)
 
 # Package files the demo actually executes. The ui/ -> core/ and ui/ ->
 # client/ relative imports mean this layout has to be preserved exactly.
@@ -108,6 +112,141 @@ def render_rows(index: dict) -> str:
     return "\n".join(rows)
 
 
+# The demo corpus uses only `## ` headings and blank-line-separated
+# paragraphs — verified across all nine files — so a full markdown library
+# would be a dependency bought for nothing. If the corpus ever grows richer
+# syntax, replace this rather than extending it.
+def render_markdown(body: str) -> str:
+    out = []
+    for block in re.split(r"\n\s*\n", body.strip()):
+        block = block.strip()
+        if not block:
+            continue
+        m = re.match(r"^##\s+(.+)$", block)
+        if m:
+            out.append(f"        <h2>{escape(m.group(1).strip())}</h2>")
+        else:
+            text = escape(" ".join(line.strip() for line in block.split("\n")))
+            out.append(f"        <p>{text}</p>")
+    return "\n".join(out)
+
+
+def field_rows(doc: dict, fm: dict) -> str:
+    """The index record, rendered with provenance.
+
+    `title` and `keywords` here are author_declared because this corpus's
+    frontmatter declares them. `summary` and `headings` are read out of the
+    document body by the extractor — headings verbatim, the summary as the
+    first real paragraph — so they are labeled as derived. That distinction is
+    the entire reason the metadata carries source tags at all.
+    """
+    declared_kw = isinstance(fm.get("keywords"), list) and fm.get("keywords")
+
+    def row(label, value, source):
+        cls = "src-author" if source == "author_declared" else "src-system"
+        nice = "author declared" if source == "author_declared" else "system inferred"
+        return (
+            '        <div class="field">\n'
+            f'          <dt>{escape(label)}<span class="src {cls}">{nice}</span></dt>\n'
+            f'          <dd>{value}</dd>\n'
+            '        </div>'
+        )
+
+    def chips(items):
+        return " ".join(f'<code class="chip-val">{escape(i)}</code>' for i in items) or "<em>none</em>"
+
+    rows = [
+        row("id", f'<code class="chip-val">{escape(doc["i"])}</code>', "author_declared"),
+        row("title", escape(doc.get("t", "")), "author_declared"),
+        row("summary", escape(doc.get("s", "")), "system_inferred"),
+        row("headings", chips(doc.get("h") or []), "author_declared"),
+        row("keywords", chips(doc.get("k") or []),
+            "author_declared" if declared_kw else "system_inferred"),
+    ]
+    if doc.get("d"):
+        rows.append(row("date", escape(doc["d"]), "author_declared"))
+    return "\n".join(rows)
+
+
+def related_block(doc: dict, by_id: dict) -> str:
+    """Curated links only — never similarity, never a guess.
+
+    This is exactly the data the relation channel reads. Seeing it on the page
+    is what makes a Tier D "same series as a confirmed match" result checkable
+    rather than something the reader has to take on faith.
+    """
+    rel = doc.get("r") or []
+    if not rel:
+        return ""
+    items = []
+    for entry in rel:
+        target_id = entry[0] if isinstance(entry, (list, tuple)) else entry
+        target = by_id.get(target_id)
+        if not target:
+            continue
+        items.append(
+            '        <li><a class="rel" href="{url}">'
+            '<span class="rel-id">{tid}</span>'
+            '<span class="rel-title">{title}</span></a></li>'.format(
+                url=escape(target.get("u") or "#", quote=True),
+                tid=escape(target_id),
+                title=escape(target.get("t", "")),
+            )
+        )
+    if not items:
+        return ""
+    return (
+        '    <aside class="related">\n'
+        '      <h2>Curated relations</h2>\n'
+        '      <p class="related-intro">Declared in the index, not inferred from similarity. '
+        'A query matching one of these can surface this document through the relation '
+        'channel — labeled as a relation, never disguised as a direct hit.</p>\n'
+        '      <ul>\n' + "\n".join(items) + '\n      </ul>\n'
+        '    </aside>'
+    )
+
+
+def build_document_pages(index: dict, template: str) -> int:
+    by_id = {d["i"]: d for d in index.get("documents", [])}
+    written = 0
+
+    for doc in index.get("documents", []):
+        doc_id = doc["i"]
+        md_path = DEMO / "docs" / f"{doc_id}.md"
+        if not md_path.exists():
+            sys.exit(f"[drvs-site] no source markdown for indexed document '{doc_id}' ({md_path})")
+
+        fm, body = parse_frontmatter(md_path.read_text(encoding="utf-8"))
+
+        meta_bits = []
+        if doc.get("d"):
+            meta_bits.append(escape(doc["d"]))
+        if fm.get("language"):
+            meta_bits.append(escape(fm["language"]))
+        meta_bits.append("DRVS demo corpus")
+
+        page = (
+            template
+            .replace("{{TITLE}}", escape(doc.get("t", "")))
+            .replace("{{DOC_ID}}", escape(doc_id))
+            .replace("{{SUMMARY_ATTR}}", escape(doc.get("s", ""), quote=True))
+            .replace("{{META}}", " · ".join(meta_bits))
+            .replace("{{BODY}}", render_markdown(body))
+            .replace("{{EXTRACTED}}", field_rows(doc, fm))
+            .replace("{{RELATED}}", related_block(doc, by_id))
+        )
+
+        # The index's own `u` is the source of truth for where this lives, so
+        # a link in the corpus list can never point somewhere unbuilt.
+        url = doc.get("u") or f"/demo/{doc_id}/"
+        out_path = DIST / url.strip("/") / "index.html"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(page, encoding="utf-8")
+        written += 1
+
+    return written
+
+
 def build_demo_config() -> dict:
     """The package default config, plus the demo's English labels/relations."""
     base = json.loads((ROOT / "config" / "search.config.json").read_text(encoding="utf-8"))
@@ -128,9 +267,9 @@ def main():
         shutil.rmtree(DIST)
     DIST.mkdir(parents=True)
 
-    # 1. static source
+    # 1. static source (files starting with "_" are templates, not assets)
     for path in SRC.rglob("*"):
-        if path.is_file() and path.name != "index.html":
+        if path.is_file() and path.name != "index.html" and not path.name.startswith("_"):
             copy(path, DIST / path.relative_to(SRC))
 
     # 2. the real package
@@ -165,8 +304,14 @@ def main():
     html = html.replace("<!--DOCUMENT_ROWS-->", render_rows(index))
     (DIST / "index.html").write_text(html, encoding="utf-8")
 
+    # 6. a real page per document — the corpus list links to these, and a demo
+    #    whose links go nowhere is a worse advertisement than no demo at all
+    doc_template = (SRC / "_document.html").read_text(encoding="utf-8")
+    written = build_document_pages(index, doc_template)
+
     print(f"[drvs-site] built -> {DIST}")
     print(f"[drvs-site] {len(index.get('documents', []))} documents rendered into the HTML")
+    print(f"[drvs-site] {written} document pages written")
     if skipped_data:
         print(f"[drvs-site] optional artifacts not present (channel degrades, as designed): {skipped_data}")
 

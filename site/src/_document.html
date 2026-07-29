@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} — DRVS demo corpus</title>
+<meta name="description" content="{{SUMMARY_ATTR}}">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/styles.css">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-in">
+    <a class="wordmark" href="/">DRVS</a>
+    <nav aria-label="Primary">
+      <a href="/#demo">Demo</a>
+      <a href="/#tiers">Tiers</a>
+      <a href="/#channels">Channels</a>
+      <a href="/#install">Install</a>
+      <a class="ext" href="https://github.com/kakon77777-commits/drvs">GitHub<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc-page">
+  <div class="wrap">
+
+    <a class="back" href="/#demo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      Back to the demo corpus
+    </a>
+
+    <article>
+      <header class="art-head">
+        <p class="art-id">{{DOC_ID}}</p>
+        <h1>{{TITLE}}</h1>
+        <p class="art-meta">{{META}}</p>
+      </header>
+
+      <div class="art-body">
+{{BODY}}
+      </div>
+    </article>
+
+    <!-- The point of these pages is not the prose. It is showing what the
+         build pipeline derived from that prose, and how honest it is about
+         which parts it derived rather than read. -->
+    <aside class="extracted">
+      <h2>What DRVS extracted from this document</h2>
+      <p class="extracted-intro">
+        This is the whole record the search index holds for this page —
+        produced by <code>build/extract.py</code> at build time. Every derived
+        field is tagged with where it came from, so a heuristic guess is never
+        presented as something the author asserted.
+      </p>
+
+      <dl class="fields">
+{{EXTRACTED}}
+      </dl>
+    </aside>
+
+{{RELATED}}
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>
+      <p class="foot-mark">DRVS</p>
+      <p class="foot-note">
+        This document is part of a small synthetic corpus written to demonstrate
+        the package on subject matter it has nothing to do with.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="/">Home</a>
+      <a href="https://github.com/kakon77777-commits/drvs">GitHub</a>
+      <a href="https://evemisslab.com">EveMissLab</a>
+      <span>MIT</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
