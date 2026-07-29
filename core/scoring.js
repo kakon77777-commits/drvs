@@ -77,6 +77,20 @@ export const DEFAULT_RELATION_TYPES = {
 };
 const FALLBACK_RELATION_META = { label: "與直接結果相關", relation: "related", weightKey: "series_relation" };
 
+// English counterpart to DEFAULT_RELATION_TYPES. Relation labels live here
+// rather than in the label sets below because a relation's text and its
+// scoring weight have to travel together — but that also means overriding
+// `cfg.labels` alone does NOT translate them, which is an easy and very
+// visible thing to miss (an otherwise-English result list with one Chinese
+// row in it). Pass this alongside LABELS_EN.
+export const RELATION_TYPES_EN = {
+  s: { label: "same series as a confirmed match", relation: "same_series", weightKey: "series_relation" },
+  p: { label: "later version of a confirmed match", relation: "next_version_of", weightKey: "direct_link_relation" },
+  n: { label: "earlier version of a confirmed match", relation: "previous_version_of", weightKey: "direct_link_relation" },
+  e: { label: "explicitly cited by a confirmed match", relation: "explicit_link", weightKey: "direct_link_relation" },
+  k: { label: "shares a primary keyword with a confirmed match", relation: "same_primary_keyword", weightKey: "series_relation" },
+};
+
 // Reason labels for every non-relation channel. These are the strings a
 // reader actually sees explaining why a document matched, so they are
 // configuration, not constants — a corpus in another language (or another

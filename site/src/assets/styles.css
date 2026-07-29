@@ -128,6 +128,13 @@ code, pre { font-family: var(--mono); }
 }
 .masthead nav a:hover { color: var(--paper); }
 .masthead nav .ext { display: inline-flex; align-items: center; gap: .3rem; color: var(--safelight); }
+.masthead nav .lang {
+  font-family: var(--mono); font-size: .74rem; letter-spacing: .04em;
+  border: 1px solid var(--line); border-radius: 3px;
+  padding: .22rem .55rem; color: var(--paper-dim);
+}
+.masthead nav .lang:hover { border-color: var(--safelight); color: var(--safelight); }
+
 .masthead nav .ext svg {
   width: .78em; height: .78em; fill: none; stroke: currentColor;
   stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;

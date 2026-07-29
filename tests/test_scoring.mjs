@@ -13,10 +13,12 @@ import {
   normalizeQuery, tokenize, trigrams, expandQuery, prepareIndex,
   scoreDocument, assignTier, diversityRerank, titlePrefixKey, scoreCorpus,
   DEFAULT_CONFIG, DEFAULT_TIERS, DEFAULT_LABELS, LABELS_EN,
+  DEFAULT_RELATION_TYPES, RELATION_TYPES_EN,
 } from "../core/scoring.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DEMO_DIST = join(__dirname, "..", "examples", "demo-corpus", "dist");
+const DEMO_DIST = join(__dirname, "..", "examples", "demo-corpus", "dist", "zh-Hant");
+const DEMO_DIST_EN = join(__dirname, "..", "examples", "demo-corpus", "dist", "en");
 
 let pass = 0, fail = 0;
 function check(category, label, cond, detail) {
@@ -195,6 +197,56 @@ check("scoreCorpus", "empty document list returns empty_index without throwing",
   check("labels", "a JSON-style {} template label interpolates without needing a function",
     jsonish.results[0]?.reasons[0]?.label === "passage matched under Watering",
     `got=${jsonish.results[0]?.reasons[0]?.label}`);
+}
+
+// --- the English edition of the same corpus ------------------------------
+// The two editions are parallel by construction (same ids, same relations),
+// so running the same scenarios against both is how "this engine is not
+// script-specific" gets checked rather than asserted. The lexical channel in
+// particular takes a completely different path for each: character bigrams
+// for Chinese, whitespace tokens for English.
+{
+  const indexEn = JSON.parse(readFileSync(join(DEMO_DIST_EN, "index.json"), "utf-8"));
+  const dictEn = JSON.parse(readFileSync(join(DEMO_DIST_EN, "dictionary.json"), "utf-8")).entries;
+  const docsEn = prepareIndex(indexEn.documents.map((d) => ({ ...d })));
+  const cfgEn = { ...DEFAULT_CONFIG, labels: LABELS_EN, relationTypes: RELATION_TYPES_EN };
+
+  check("en-corpus", "the two editions hold the same document ids",
+    JSON.stringify(indexEn.documents.map((d) => d.i).sort()) ===
+    JSON.stringify(index.documents.map((d) => d.i).sort()));
+
+  const exactEn = scoreCorpus(docsEn, "Growing tomatoes on a balcony", cfgEn, dictEn);
+  check("en-corpus", "exact title query's top hit is the right document",
+    exactEn.results[0]?.id === "balcony-tomato-basics");
+  check("en-corpus", "exact title hit lands in tier A", exactEn.results[0]?.tier === "A");
+
+  const aliasEn = scoreCorpus(docsEn, "alligator pear", cfgEn, dictEn);
+  check("en-corpus", "an English dictionary alias resolves to the right document",
+    aliasEn.results[0]?.id === "avocado-ripeness");
+
+  const relEn = scoreCorpus(docsEn, "staking and side shoots", cfgEn, dictEn);
+  const sibling = relEn.results.find((r) => r.id === "balcony-tomato-pests");
+  check("en-corpus", "a same-series sibling rides in via the relation channel",
+    !!sibling && sibling.channels.includes("relation"));
+
+  const missEn = scoreCorpus(docsEn, "how to apply for a passport", cfgEn, dictEn);
+  check("en-corpus", "an unrelated query is honestly disclosed as low-confidence",
+    missEn.low_confidence === true);
+
+  // Regression guard for a leak that is invisible in unit tests but glaring
+  // on screen: relation labels live in cfg.relationTypes, NOT cfg.labels, so
+  // translating only the latter leaves one foreign-language row sitting in an
+  // otherwise-translated result list. This was shipped once.
+  check("en-corpus", "relation label is translated when relationTypes is supplied",
+    sibling?.reasons[0]?.label === RELATION_TYPES_EN.s.label,
+    `got=${sibling?.reasons[0]?.label}`);
+
+  const labelsOnly = scoreCorpus(docsEn, "staking and side shoots",
+    { ...DEFAULT_CONFIG, labels: LABELS_EN }, dictEn);
+  const leaked = labelsOnly.results.find((r) => r.id === "balcony-tomato-pests");
+  check("en-corpus", "overriding labels alone leaves relation labels untranslated (documents the trap)",
+    leaked?.reasons[0]?.label === DEFAULT_RELATION_TYPES.s.label,
+    `got=${leaked?.reasons[0]?.label}`);
 }
 
 console.log(`\n--- ${pass}/${pass + fail} passed ---`);

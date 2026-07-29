@@ -148,9 +148,10 @@ dictionary. That is the intended workflow, not an optional extra.
 ```bash
 npm test          # scoring core + label configuration (Node, no deps)
 npm run test:py   # chunking, relations, dictionary, extraction (Python, no deps)
+node examples/demo-corpus/query_demo.mjs   # end-to-end, both language editions
 ```
 
-145 checks, no test framework in either language. Several exist specifically
+154 checks, no test framework in either language. Several exist specifically
 because a mechanical-looking function shipped a real bug that synthetic
 fixtures could not have caught — each of those cases says so in a comment, so
 the reason survives longer than the memory of the incident.

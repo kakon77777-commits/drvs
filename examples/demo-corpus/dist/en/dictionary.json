@@ -1,0 +1,15 @@
+{
+  "entries": [
+    {
+      "concept_id": "concept-avocado",
+      "canonical": "avocado",
+      "aliases": [
+        {
+          "term": "alligator pear",
+          "weight": 0.95
+        }
+      ],
+      "related": []
+    }
+  ]
+}

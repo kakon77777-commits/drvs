@@ -1,0 +1,125 @@
+{
+  "locale": "en",
+  "htmlLang": "en",
+  "dir": "/",
+  "corpusLocale": "en",
+  "otherLocaleLabel": "中文",
+  "otherLocaleHref": "/zh/",
+
+  "title": "DRVS — search that dims instead of replacing",
+  "description": "A corpus-agnostic, mostly client-side search engine. Instead of replacing your page with a result list, it dims what doesn't match and tells you why what's left is there. MIT.",
+  "ogDescription": "Reverse semantic masking: your list stays put, the misses fade, and every hit says what actually matched.",
+
+  "nav": {
+    "demo": "Demo",
+    "tiers": "Tiers",
+    "channels": "Channels",
+    "install": "Install",
+    "github": "GitHub"
+  },
+
+  "skip": "Skip to the live demo",
+
+  "hero": {
+    "eyebrow": "Dynamic Revealing Vector Search",
+    "h1": "Most search<br>replaces the page.<br><em>This one develops it.</em>",
+    "lede": "Your list stays exactly where it is, in its own order. A query only changes how <em>visible</em> each row is — strong matches stay lit, weak ones dim, misses fade to a ghost. Nothing is moved, re-sorted, or removed. You keep the context that a results page throws away.",
+    "facts": [
+      { "n": "MIT", "label": "licensed" },
+      { "n": "0", "label": "runtime dependencies" },
+      { "n": "0", "label": "servers required" },
+      { "n": "154", "label": "tests, no framework" }
+    ]
+  },
+
+  "demo": {
+    "h2": "Try it on a real index",
+    "intro": "Nine documents about entirely mundane things — coffee, balcony tomatoes, a bike chain — deliberately unrelated to anything DRVS was extracted from. This is the actual package running in your browser against a real prebuilt index. Not a mockup, not a recording.",
+    "tryLabel": "Try",
+    "chips": [
+      { "q": "coffee", "hint": "exact" },
+      { "q": "alligator pear", "hint": "alias → avocado" },
+      { "q": "Growing tomatoes on a balcony", "hint": "relation" },
+      { "q": "quantum chromodynamics", "hint": "honest miss" }
+    ],
+    "noscript": "JavaScript is off, so the search layer isn't running — and the nine documents below are all still here, fully readable. That is the design, not a fallback: the reveal layer is additive, and nothing it does is required to read the page.",
+    "corpusFoot": "This corpus also exists in Traditional Chinese, with the same ids and the same relations. Both are built and tested the same way — that parallel is how the claim \"not script-specific\" gets checked instead of asserted.",
+    "semanticOff": "Enable semantic channel (~25MB model, downloads once)",
+    "semanticOn": "Semantic channel on — click to disable",
+    "semanticLoading": "Loading model…"
+  },
+
+  "tiers": {
+    "eyebrow": "Confidence, calibrated",
+    "h2": "Four tiers, and a floor you can see",
+    "intro": "A photographer checks an exposure against a step wedge — a strip of known, evenly-spaced densities. DRVS ranks the same way: every result lands on a fixed step, and the step is the opacity you actually see. These are the real numbers from <code>config/search.config.json</code>, not an illustration.",
+    "steps": [
+      { "k": "A", "v": "1.00", "d": "Exact. The query is literally in the title, a heading, or a confirmed alias." },
+      { "k": "B", "v": "0.92", "d": "Close. Strong lexical overlap, or an exact hit somewhere less central." },
+      { "k": "C", "v": "0.62", "d": "Weak. Character-level or embedding similarity, with no literal anchor." },
+      { "k": "D", "v": "0.38", "d": "Distant. Usually structural — a sibling of something that did match." },
+      { "k": "—", "v": "0.12", "d": "Masked. Still on the page, still readable, just out of the way." }
+    ],
+    "note": "Tier is never carried by color alone. Each row gets an opacity step <em>and</em> a text label naming the reason, plus <code>data-drvs-tier</code> for assistive tech. In forced-colors mode the opacity ladder flattens and the labels carry it on their own."
+  },
+
+  "channels": {
+    "eyebrow": "Five channels, one honest answer",
+    "h2": "A hit reason must name what actually matched",
+    "intro": "Not a relevance score. Not \"the model thinks so.\" Every result carries a specific claim you can check — and if a channel has nothing to say about a document, it stays silent rather than inventing a number.",
+    "cards": [
+      { "h": "Exact", "p": "Substring against title, headings, summary, keywords. Always outranks everything below it.", "c": "exact title match" },
+      { "h": "Lexical", "p": "CJK bigrams and Latin token overlap, so typos and paraphrases still land. No stemmer, no language config.", "c": "lexical similarity" },
+      { "h": "Dictionary", "p": "Alias expansion from evidence you can point at — a curated set, or an acronym a document defines in its own title.", "c": "matched known alias “avocado”" },
+      { "h": "Relation", "p": "A document with no direct hit can ride in on a curated link to one that did — and it says so, rather than pretending it matched.", "c": "same series as a confirmed match" },
+      { "h": "Semantic", "p": "Embeddings compared in the browser against prebuilt vectors. No API, no per-query cost. Chunk-level, so it can name the passage.", "c": "this passage is close (Storage)", "accent": true },
+      { "h": "…and when it fails", "p": "Every optional channel degrades structurally. No dictionary, no vectors, model won't load — the rest keeps working and nothing upstream notices.", "c": "exact + lexical still ranked", "quiet": true }
+    ]
+  },
+
+  "principles": {
+    "eyebrow": "The part most search UIs get wrong",
+    "h2": "Never return zero results without saying so",
+    "doH3": "What DRVS does",
+    "doP": "When nothing clears the confidence bar, it relaxes the threshold, still returns the closest documents, and tells you plainly that it did: <em>\"No high-confidence direct match. Showing the semantically closest documents only.\"</em> You can see the results and you can see the caveat.",
+    "dontH3": "What it refuses to do",
+    "dontP": "Dress a weak match up as a confident one. Relaxing the threshold is always disclosed, a low-confidence banner is never suppressed, and an index with genuinely nothing in it says so rather than padding the list. Non-zero results is not permission to fabricate."
+  },
+
+  "install": {
+    "eyebrow": "Getting started",
+    "h2": "Point it at a list you already have",
+    "step1": "Build an index",
+    "step1p": "Python, build time. The helpers do the file-level work — frontmatter, headings, summary, keywords — so your adapter is mostly plumbing.",
+    "step2": "Mount the reveal layer",
+    "step2p": "The control markup is built for you. Your rows are left alone except for classes and data attributes.",
+    "step3": "Theme it",
+    "step3p": "Override custom properties. You should never need to fork the stylesheet.",
+    "honestH3": "What you still have to build yourself",
+    "honestP1": "The adapter that turns your actual files into documents — walking your storage, assigning stable ids, mapping URLs. DRVS deliberately has no opinion on what a corpus is made of, because that is the one part no generic package can do for you honestly.",
+    "honestP2": "And what goes in the dictionary. The builder will propose entries from self-defining titles, but a fabricated alias is the most damaging thing this system can do: it makes unrelated documents look like confirmed matches, under the most authoritative label the interface has. Read <code>audit_candidates()</code> output before shipping one.",
+    "ctaSource": "Read the source",
+    "ctaAdapting": "Adapting a corpus",
+    "ctaSchema": "Document schema"
+  },
+
+  "footer": {
+    "note": "Distilled from a production deployment over a ~2,000-document corpus, then re-verified against a corpus with nothing in common with it.",
+    "home": "Home",
+    "evemisslab": "EveMissLab",
+    "logicMatrix": "Logic Matrix"
+  },
+
+  "docPage": {
+    "back": "Back to the demo corpus",
+    "extractedH2": "What DRVS extracted from this document",
+    "extractedIntro": "This is the whole record the search index holds for this page — produced by <code>build/extract.py</code> at build time. Every derived field is tagged with where it came from, so a heuristic guess is never presented as something the author asserted.",
+    "relatedH2": "Curated relations",
+    "relatedIntro": "Declared in the index, not inferred from similarity. A query matching one of these can surface this document through the relation channel — labeled as a relation, never disguised as a direct hit.",
+    "corpusNote": "part of the DRVS demo corpus",
+    "authorDeclared": "author declared",
+    "systemInferred": "system inferred",
+    "none": "none",
+    "footNote": "This document is part of a small synthetic corpus written to demonstrate the package on subject matter it has nothing to do with."
+  }
+}

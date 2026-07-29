@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="{{docLang}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{TITLE}} — DRVS demo corpus</title>
+<title>{{TITLE}} — DRVS</title>
 <meta name="description" content="{{SUMMARY_ATTR}}">
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex">
@@ -18,13 +18,14 @@
 
 <header class="masthead">
   <div class="wrap masthead-in">
-    <a class="wordmark" href="/">DRVS</a>
+    <a class="wordmark" href="{{dir}}">DRVS</a>
     <nav aria-label="Primary">
-      <a href="/#demo">Demo</a>
-      <a href="/#tiers">Tiers</a>
-      <a href="/#channels">Channels</a>
-      <a href="/#install">Install</a>
-      <a class="ext" href="https://github.com/kakon77777-commits/drvs">GitHub<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+      <a href="{{dir}}#demo">{{nav.demo}}</a>
+      <a href="{{dir}}#tiers">{{nav.tiers}}</a>
+      <a href="{{dir}}#channels">{{nav.channels}}</a>
+      <a href="{{dir}}#install">{{nav.install}}</a>
+      <a class="ext" href="https://github.com/kakon77777-commits/drvs">{{nav.github}}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+      <a class="lang" href="{{OTHER_DOC_HREF}}" hreflang="{{otherLocaleLang}}">{{otherLocaleLabel}}</a>
     </nav>
   </div>
 </header>
@@ -32,9 +33,9 @@
 <main class="doc-page">
   <div class="wrap">
 
-    <a class="back" href="/#demo">
+    <a class="back" href="{{dir}}#demo">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-      Back to the demo corpus
+      {{docPage.back}}
     </a>
 
     <article>
@@ -53,13 +54,8 @@
          build pipeline derived from that prose, and how honest it is about
          which parts it derived rather than read. -->
     <aside class="extracted">
-      <h2>What DRVS extracted from this document</h2>
-      <p class="extracted-intro">
-        This is the whole record the search index holds for this page —
-        produced by <code>build/extract.py</code> at build time. Every derived
-        field is tagged with where it came from, so a heuristic guess is never
-        presented as something the author asserted.
-      </p>
+      <h2>{{docPage.extractedH2}}</h2>
+      <p class="extracted-intro">{{docPage.extractedIntro}}</p>
 
       <dl class="fields">
 {{EXTRACTED}}
@@ -75,15 +71,13 @@
   <div class="wrap foot-in">
     <div>
       <p class="foot-mark">DRVS</p>
-      <p class="foot-note">
-        This document is part of a small synthetic corpus written to demonstrate
-        the package on subject matter it has nothing to do with.
-      </p>
+      <p class="foot-note">{{docPage.footNote}}</p>
     </div>
     <div class="foot-links">
-      <a href="/">Home</a>
-      <a href="https://github.com/kakon77777-commits/drvs">GitHub</a>
-      <a href="https://evemisslab.com">EveMissLab</a>
+      <a href="{{dir}}">{{docPage.back}}</a>
+      <a href="https://github.com/kakon77777-commits/drvs">{{nav.github}}</a>
+      <a href="https://evemisslab.com">{{footer.evemisslab}}</a>
+      <a href="{{OTHER_DOC_HREF}}" hreflang="{{otherLocaleLang}}">{{otherLocaleLabel}}</a>
       <span>MIT</span>
     </div>
   </div>

@@ -3,7 +3,7 @@
  "onnx_model": "Xenova/bge-small-zh-v1.5",
  "dim": 512,
  "query_instruction": "为这个句子生成表示以用于检索相关文章：",
- "generated_at": "2026-07-28T08:53:40Z",
+ "generated_at": "2026-07-29T02:37:23Z",
  "items": {
   "avocado-ripeness": {
    "hash": "sha256:07b77f8f791c4fa7",
