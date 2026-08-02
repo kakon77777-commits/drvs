@@ -27,6 +27,7 @@ Usage:  python3 site/build.py
 import json
 import re
 import shutil
+import subprocess
 import sys
 from html import escape
 from pathlib import Path
@@ -486,6 +487,14 @@ def main():
     for loc in locales:
         other = next(l for l in locales if l["locale"] != loc["locale"])
         results.append(build_locale(loc, other, index_template, doc_template))
+
+    # sitemap, generated from what was just written rather than from a list —
+    # the demo documents carry noindex and are excluded automatically.
+    subprocess.run(
+        [sys.executable, str(ROOT / "site" / "tools" / "gen_sitemap.py"),
+         "--root", str(DIST), "--origin", "https://drvs.evemisslab.com"],
+        check=True,
+    )
 
     print(f"[drvs-site] built -> {DIST}")
     for r in results:
